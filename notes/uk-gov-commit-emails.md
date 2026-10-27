@@ -77,6 +77,8 @@ nationalcrimeagency.gov.uk
 
 ## Full Results
 
+These results show how many commits were made using emails containing each domain name.
+
 ```
 digital.cabinet-office.gov.uk,313848
 gmail.com,270760
