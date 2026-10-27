@@ -15,7 +15,6 @@ use publiccode::utils::read_lines;
 const ORGS_LIST_PATH: &str = "./data/gb-orgs.txt";
 const RESULTS_PATH: &str = "./results/repo-names.txt";
 
-#[allow(dead_code)]
 #[derive(Deserialize, Debug)]
 struct GithubRepo {
     full_name: String,
@@ -41,6 +40,7 @@ async fn get_repo_names_for_org(http_client: &Client, org_name: &str) -> Result<
         let status = response.status();
         let json_string = response.text().await?;
         if status != 200 {
+            eprintln!("got status {}", status);
             if status == 404 {
                 break;
             } else {
@@ -77,7 +77,7 @@ async fn get_repo_names(http_client: &Client) -> Result<Vec<String>> {
 async fn main() -> Result<()> {
     let http_client = Client::builder()
         .timeout(Duration::from_secs(30))
-        .user_agent("contact vlad@vlad.website")
+        .user_agent("publiccode; contact vlad@vlad.website")
         .build()?;
     let repo_names = get_repo_names(&http_client).await?;
     eprintln!("repo_names\t{:#?}", repo_names.len());
