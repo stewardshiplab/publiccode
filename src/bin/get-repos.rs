@@ -41,8 +41,12 @@ async fn get_repo_names_for_org(http_client: &Client, org_name: &str) -> Result<
         let status = response.status();
         let json_string = response.text().await?;
         if status != 200 {
-            eprintln!("res\t{:#?}", json_string);
-            return Err(anyhow!("got status {}", status));
+            if status == 404 {
+                break;
+            } else {
+                eprintln!("res\t{:#?}", json_string);
+                return Err(anyhow!("got status {}", status));
+            }
         }
         let new_repos: Vec<GithubRepo> = serde_json::from_str(&json_string)?;
         let mut new_repo_names: Vec<_> = new_repos.into_iter().map(|d| d.full_name).collect();
@@ -62,8 +66,8 @@ async fn get_repo_names(http_client: &Client) -> Result<Vec<String>> {
     for org_name in org_names.into_iter().map_while(Result::ok) {
         eprintln!("org\t{:#?}", org_name);
         let mut new_repo_names = get_repo_names_for_org(&http_client, &org_name).await?;
-        repo_names.append(&mut new_repo_names);
         eprintln!("repo_names\t{:#?}", new_repo_names.len());
+        repo_names.append(&mut new_repo_names);
         eprintln!("");
     }
     Ok(repo_names)
