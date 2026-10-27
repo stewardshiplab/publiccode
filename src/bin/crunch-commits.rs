@@ -34,6 +34,7 @@ async fn main() -> Result<()> {
         .timeout(Duration::from_secs(30))
         .user_agent("publiccode; contact vlad@vlad.website")
         .build()?;
+    let mut n_repos_fetched = 0;
     let mut domain_counter: HashMap<String, u64> = HashMap::new();
     let repo_names: Vec<_> = read_lines(REPO_NAMES_PATH)?.collect();
     let n_repos = repo_names.len();
@@ -49,19 +50,20 @@ async fn main() -> Result<()> {
         let status = response.status();
         let json_string = response.text().await?;
         eprintln!(
-            "{:<15}{} {}",
-            format!("{:05}/{:05}", idx, n_repos),
+            "{:<30}{} {}",
+            format!("{:05}/{:05} ({:05})", idx, n_repos, n_repos_fetched),
             status.as_u16(),
-            url.as_str()
+            repo_name
         );
         if status != 200 {
             if status == 404 || status == 202 {
                 continue;
             } else {
-                eprintln!("{:<15}{}", "res", json_string);
+                eprintln!("{:<30}{}", "res", json_string);
                 return Err(anyhow!("got status {}", status));
             }
         }
+        n_repos_fetched += 1;
         let commits: RepoCommits = serde_json::from_str(&json_string)?;
         for committer in &commits.committers {
             if !committer.email.contains("@") {
@@ -79,6 +81,10 @@ async fn main() -> Result<()> {
     for domain_count in &domain_counter_vec {
         let _ = file.write_all(format!("{},{}\n", domain_count.0, domain_count.1).as_bytes());
     }
-    eprintln!("Wrote {} rows", domain_counter_vec.len());
+    eprintln!(
+        "Wrote {} rows for {} fetched repos",
+        domain_counter_vec.len(),
+        n_repos_fetched
+    );
     Ok(())
 }
