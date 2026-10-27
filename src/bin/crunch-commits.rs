@@ -32,7 +32,7 @@ struct RepoCommits {
 async fn main() -> Result<()> {
     let http_client = Client::builder()
         .timeout(Duration::from_secs(30))
-        .user_agent("publiccode; contact vlad@vlad.website")
+        .user_agent("publiccode; mailto:vlad@vlad.website")
         .build()?;
     let mut n_repos_fetched = 0;
     let mut domain_counter: HashMap<String, u64> = HashMap::new();

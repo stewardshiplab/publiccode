@@ -77,7 +77,7 @@ async fn get_repo_names(http_client: &Client) -> Result<Vec<String>> {
 async fn main() -> Result<()> {
     let http_client = Client::builder()
         .timeout(Duration::from_secs(30))
-        .user_agent("publiccode; contact vlad@vlad.website")
+        .user_agent("publiccode; mailto:vlad@vlad.website")
         .build()?;
     let repo_names = get_repo_names(&http_client).await?;
     eprintln!("repo_names\t{:#?}", repo_names.len());
