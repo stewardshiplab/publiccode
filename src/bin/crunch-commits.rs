@@ -12,7 +12,7 @@ use url::Url;
 
 use publiccode::utils::read_lines;
 
-const REPO_NAMES_PATH: &str = "./results/repo-names-small.txt";
+const REPO_NAMES_PATH: &str = "./results/repo-names.txt";
 const DOMAIN_COUNTS_PATH: &str = "./results/domain-counts.csv";
 
 #[derive(Deserialize, Debug)]
@@ -36,7 +36,8 @@ async fn main() -> Result<()> {
         .build()?;
     let mut domain_counter: HashMap<String, u64> = HashMap::new();
     let repo_names: Vec<_> = read_lines(REPO_NAMES_PATH)?.collect();
-    for repo_name in repo_names.into_iter().map_while(Result::ok) {
+    let n_repos = repo_names.len();
+    for (idx, repo_name) in repo_names.into_iter().map_while(Result::ok).enumerate() {
         let url = Url::parse(
             format!(
                 "https://commits.ecosyste.ms/api/v1/hosts/GitHub/repositories/{}",
@@ -47,7 +48,12 @@ async fn main() -> Result<()> {
         let response = http_client.get(url.as_str()).send().await?;
         let status = response.status();
         let json_string = response.text().await?;
-        eprintln!("{:<15}{}", status.as_u16(), url.as_str());
+        eprintln!(
+            "{:<15}{} {}",
+            format!("{:05}/{:05}", idx, n_repos),
+            status.as_u16(),
+            url.as_str()
+        );
         if status != 200 {
             if status == 404 || status == 202 {
                 continue;
