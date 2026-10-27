@@ -1,0 +1,13 @@
+version = 1
+
+[[annotations]]
+path = [
+    ".gitignore",
+    ".well-known/**",
+    "Cargo.lock",
+    "Cargo.toml",
+    "data/**/*",
+    "results/**/*",
+]
+SPDX-FileCopyrightText = "NONE"
+SPDX-License-Identifier = "CC0-1.0"
