@@ -13,7 +13,7 @@ use url::Url;
 use publiccode::utils::read_lines;
 
 const ORGS_LIST_PATH: &str = "./data/gb-orgs.txt";
-const RESULTS_PATH: &str = "./results/repo-names.txt";
+const REPO_NAMES_PATH: &str = "./results/repo-names.txt";
 
 #[derive(Deserialize, Debug)]
 struct GithubRepo {
@@ -81,7 +81,7 @@ async fn main() -> Result<()> {
         .build()?;
     let repo_names = get_repo_names(&http_client).await?;
     eprintln!("repo_names\t{:#?}", repo_names.len());
-    let mut file = File::create(RESULTS_PATH)?;
+    let mut file = File::create(REPO_NAMES_PATH)?;
     let _ = file.write_all(repo_names.join("\n").as_bytes());
     Ok(())
 }
